@@ -9,40 +9,49 @@ import inquirer from 'inquirer';
 import { program } from 'commander';
 import fs from 'fs';
 
-const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  
-</body>
-</html>`;
-
-
-program
-  .arguments('filename')
-  .action((filename) => {
-    fs.writeFile(`${filename}.html`, html, (err) => {
-      if (err) throw err;
-      console.log(`${filename}.html created successfully`);
-    });
-  });
-
-program.parse(process.argv);
-
 inquirer
   .prompt([{
     type: 'input',
     name: 'title',
-    message: 'html title : '
+    message: 'title의 기본 정보 : '
+  }, {
+    type: 'confirm',
+    name: 'root',
+    message: 'root태그 사용 할건가?',
   },
   {
     type: 'input',
-    name : 'content',
-    message: 'html content: '
+    name: 'content',
+    message: '본문 <p>태그 내용 작성'
   }
-])
+  ])
+  .then(ans => {
+    let body = '';
+    if(ans.root === true){
+      body = '<div id="root"></div>'
+    }
+    const title = ans.title;
+    const content = ans.content;
+    const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>${title}</title>
+</head>
+<body>
+  ${body}
+  <p>${content}</p>
+</body>
+</html>
+`
+    program
+      .argument('filename')
+      .action((filename) => {
+        fs.writeFile(`C:/Users/Administrator/Desktop/이경택/2023_04_28_inquirer_commander/result/${filename}.html`, html, (err) => {
+          if (err) throw err;
+          console.log(`${filename}.html created successfully`);
+        })
+      })
+      .parse(process.argv)
+  })
+
